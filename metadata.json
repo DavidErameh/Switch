@@ -1,5 +1,5 @@
 {
-  "name": "Neumorphic Drop Button",
-  "description": "A clean, minimal circular neumorphic button with soft embossed effects and interactions.",
+  "name": "Neumorphic Switch",
+  "description": "A minimal, interactive neumorphic toggle switch with mechanical sound effects and day/night mode transitions.",
   "requestFramePermissions": []
 }
