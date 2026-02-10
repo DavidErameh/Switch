@@ -35,7 +35,6 @@ export const NeumorphicDropButton: React.FC<NeumorphicDropButtonProps> = ({ isOn
     masterGain.connect(ctx.destination);
 
     // 1. The "Snap" (High frequency mechanical click)
-    // Triangle wave for that sharp, metallic microswitch feel
     const snapOsc = ctx.createOscillator();
     const snapGain = ctx.createGain();
     snapOsc.type = 'triangle';
@@ -43,7 +42,6 @@ export const NeumorphicDropButton: React.FC<NeumorphicDropButtonProps> = ({ isOn
     snapGain.connect(masterGain);
 
     // 2. The "Thud" (Plastic casing resonance)
-    // Sine wave for the button housing body
     const bodyOsc = ctx.createOscillator();
     const bodyGain = ctx.createGain();
     bodyOsc.type = 'sine';
@@ -51,36 +49,32 @@ export const NeumorphicDropButton: React.FC<NeumorphicDropButtonProps> = ({ isOn
     bodyGain.connect(masterGain);
 
     if (type === 'down') {
-      // PRESS: High-tension mechanical release
-      // Very fast, high-pitched chirp 
+      // PRESS: Sharper, faster attack for snappiness
       snapOsc.frequency.setValueAtTime(4500, t);
-      snapOsc.frequency.exponentialRampToValueAtTime(1200, t + 0.01);
+      snapOsc.frequency.exponentialRampToValueAtTime(1200, t + 0.008);
       
-      snapGain.gain.setValueAtTime(0.6, t);
-      snapGain.gain.exponentialRampToValueAtTime(0.001, t + 0.015);
+      snapGain.gain.setValueAtTime(0.7, t);
+      snapGain.gain.exponentialRampToValueAtTime(0.001, t + 0.012);
 
-      // Short, tight body thud
       bodyOsc.frequency.setValueAtTime(400, t);
-      bodyOsc.frequency.exponentialRampToValueAtTime(100, t + 0.04);
-      
-      bodyGain.gain.setValueAtTime(0.2, t);
-      bodyGain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
-
-    } else {
-      // RELEASE: Plastic return spring
-      // Slightly lower, "hollower" sound
-      snapOsc.frequency.setValueAtTime(2800, t);
-      snapOsc.frequency.exponentialRampToValueAtTime(800, t + 0.015);
-      
-      snapGain.gain.setValueAtTime(0.4, t);
-      snapGain.gain.exponentialRampToValueAtTime(0.001, t + 0.015);
-
-      // More resonance on the return stroke
-      bodyOsc.frequency.setValueAtTime(300, t);
-      bodyOsc.frequency.exponentialRampToValueAtTime(60, t + 0.06);
+      bodyOsc.frequency.exponentialRampToValueAtTime(100, t + 0.03);
       
       bodyGain.gain.setValueAtTime(0.3, t);
-      bodyGain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+      bodyGain.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+
+    } else {
+      // RELEASE: Quick return
+      snapOsc.frequency.setValueAtTime(2800, t);
+      snapOsc.frequency.exponentialRampToValueAtTime(800, t + 0.012);
+      
+      snapGain.gain.setValueAtTime(0.5, t);
+      snapGain.gain.exponentialRampToValueAtTime(0.001, t + 0.012);
+
+      bodyOsc.frequency.setValueAtTime(300, t);
+      bodyOsc.frequency.exponentialRampToValueAtTime(60, t + 0.05);
+      
+      bodyGain.gain.setValueAtTime(0.4, t);
+      bodyGain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
     }
 
     // Start and Cleanup
@@ -91,12 +85,18 @@ export const NeumorphicDropButton: React.FC<NeumorphicDropButtonProps> = ({ isOn
     bodyOsc.stop(t + 0.1); 
   };
 
-  const handlePressStart = () => {
+  const handlePressStart = (e: React.MouseEvent | React.TouchEvent) => {
+    // Prevent default to avoid scrolling/zooming issues on mobile during quick taps
+    // but allow scrolling if they miss the button, so we don't preventDefault globally.
+    // However, for the button itself, we want instant reaction.
     setIsPressed(true);
     playClickSound('down');
   };
   
-  const handlePressEnd = () => {
+  const handlePressEnd = (e: React.MouseEvent | React.TouchEvent) => {
+    // Prevent ghost clicks on mobile
+    if (e.type === 'touchend') e.preventDefault();
+    
     if (isPressed) {
       setIsPressed(false);
       playClickSound('up');
@@ -114,15 +114,14 @@ export const NeumorphicDropButton: React.FC<NeumorphicDropButtonProps> = ({ isOn
   
   // Base Colors
   const lightBase = '#E0E5EC';
-  const darkBase = '#535D6C'; // Dimmed room color
+  const darkBase = '#535D6C';
 
-  // Shadows
-  const lightFlat = '12px 12px 24px rgba(163,177,198,0.6), -12px -12px 24px rgba(255,255,255, 0.5)';
-  const lightPressed = 'inset 6px 6px 12px rgba(163,177,198, 0.7), inset -6px -6px 12px rgba(255,255,255, 0.8)';
+  // Shadows - Slightly tighter blur for a crisper look
+  const lightFlat = '10px 10px 20px rgba(163,177,198,0.6), -10px -10px 20px rgba(255,255,255, 0.5)';
+  const lightPressed = 'inset 5px 5px 10px rgba(163,177,198, 0.7), inset -5px -5px 10px rgba(255,255,255, 0.8)';
 
-  // Dim Mode Shadows
-  const darkFlat = '15px 15px 30px rgba(0,0,0,0.4), -10px -10px 20px rgba(255,255,255, 0.05)';
-  const darkPressed = 'inset 8px 8px 16px rgba(0,0,0,0.4), inset -8px -8px 16px rgba(255,255,255, 0.05)';
+  const darkFlat = '12px 12px 24px rgba(0,0,0,0.4), -8px -8px 16px rgba(255,255,255, 0.05)';
+  const darkPressed = 'inset 6px 6px 12px rgba(0,0,0,0.4), inset -6px -6px 12px rgba(255,255,255, 0.05)';
 
   const currentBase = isOn ? lightBase : darkBase;
   const currentFlat = isOn ? lightFlat : darkFlat;
@@ -138,21 +137,23 @@ export const NeumorphicDropButton: React.FC<NeumorphicDropButtonProps> = ({ isOn
     : 'text-blue-300 drop-shadow-[0_0_10px_rgba(147,197,253,0.3)] opacity-70';
 
   return (
-    <div className="flex flex-col items-center gap-6 md:gap-8">
+    <div className="flex flex-col items-center gap-5 md:gap-8">
       <button
         onMouseDown={handlePressStart}
         onMouseUp={handlePressEnd}
         onMouseLeave={handleMouseLeave}
         onTouchStart={handlePressStart}
         onTouchEnd={handlePressEnd}
-        className="relative flex items-center justify-center w-36 h-36 md:w-48 md:h-48 rounded-full outline-none tap-highlight-transparent cursor-pointer select-none"
+        className="relative flex items-center justify-center w-32 h-32 md:w-48 md:h-48 rounded-full outline-none select-none touch-manipulation"
         style={{
           backgroundColor: currentBase,
           boxShadow: isPressed ? currentPressed : currentFlat,
-          transform: isPressed ? 'scale(0.97)' : 'scale(1)',
+          transform: isPressed ? 'scale(0.96)' : 'scale(1)',
+          // Separate transitions: Instant physical response, smooth color fade
           transitionProperty: 'background-color, box-shadow, transform',
-          transitionDuration: '700ms, 150ms, 150ms',
-          transitionTimingFunction: 'ease, ease-out, ease-out'
+          transitionDuration: `700ms, ${isPressed ? '50ms' : '150ms'}, ${isPressed ? '50ms' : '150ms'}`,
+          transitionTimingFunction: 'ease, ease-out, ease-out',
+          WebkitTapHighlightColor: 'transparent'
         }}
         aria-label={isOn ? "Turn Off" : "Turn On"}
         aria-pressed={isPressed}
@@ -166,7 +167,7 @@ export const NeumorphicDropButton: React.FC<NeumorphicDropButtonProps> = ({ isOn
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="w-10 h-10 md:w-14 md:h-14"
+            className="w-10 h-10 md:w-16 md:h-16"
           >
             <circle cx="12" cy="12" r="9" />
           </svg>
@@ -175,7 +176,7 @@ export const NeumorphicDropButton: React.FC<NeumorphicDropButtonProps> = ({ isOn
 
       {/* Label Text */}
       <span 
-        className={`text-lg md:text-xl font-medium tracking-[0.2em] select-none transition-all duration-700 ease-in-out ${labelClass}`}
+        className={`text-base md:text-xl font-medium tracking-[0.2em] select-none transition-all duration-700 ease-in-out ${labelClass}`}
       >
         SWITCH
       </span>
