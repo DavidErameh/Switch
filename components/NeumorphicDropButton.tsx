@@ -138,14 +138,14 @@ export const NeumorphicDropButton: React.FC<NeumorphicDropButtonProps> = ({ isOn
     : 'text-blue-300 drop-shadow-[0_0_10px_rgba(147,197,253,0.3)] opacity-70';
 
   return (
-    <div className="flex flex-col items-center gap-8">
+    <div className="flex flex-col items-center gap-6 md:gap-8">
       <button
         onMouseDown={handlePressStart}
         onMouseUp={handlePressEnd}
         onMouseLeave={handleMouseLeave}
         onTouchStart={handlePressStart}
         onTouchEnd={handlePressEnd}
-        className="relative flex items-center justify-center w-48 h-48 rounded-full outline-none tap-highlight-transparent cursor-pointer select-none"
+        className="relative flex items-center justify-center w-36 h-36 md:w-48 md:h-48 rounded-full outline-none tap-highlight-transparent cursor-pointer select-none"
         style={{
           backgroundColor: currentBase,
           boxShadow: isPressed ? currentPressed : currentFlat,
@@ -160,14 +160,13 @@ export const NeumorphicDropButton: React.FC<NeumorphicDropButtonProps> = ({ isOn
         {/* Icon */}
         <div className={`transition-all duration-700 ease-in-out ${iconClass}`}>
           <svg
-            width="56"
-            height="56"
             viewBox="0 0 24 24"
             fill={isOn ? "currentColor" : "none"} 
             stroke="currentColor"
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
+            className="w-10 h-10 md:w-14 md:h-14"
           >
             <circle cx="12" cy="12" r="9" />
           </svg>
@@ -176,7 +175,7 @@ export const NeumorphicDropButton: React.FC<NeumorphicDropButtonProps> = ({ isOn
 
       {/* Label Text */}
       <span 
-        className={`text-xl font-medium tracking-[0.2em] select-none transition-all duration-700 ease-in-out ${labelClass}`}
+        className={`text-lg md:text-xl font-medium tracking-[0.2em] select-none transition-all duration-700 ease-in-out ${labelClass}`}
       >
         SWITCH
       </span>
